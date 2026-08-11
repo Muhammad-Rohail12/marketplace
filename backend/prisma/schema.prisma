@@ -1,0 +1,1390 @@
+// ==================================================
+// PRISMA CONFIGURATION
+// ==================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================================================
+// ENUMS
+// ==================================================
+
+enum Role {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum VerificationTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+enum BrandStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AttributeType {
+  TEXT
+  NUMBER
+  DECIMAL
+  BOOLEAN
+  COLOR
+  SIZE
+  DROPDOWN
+  MULTISELECT
+  DATE
+  MEASUREMENT
+  URL
+  RICH_TEXT
+  IMAGE_REFERENCE
+}
+
+enum UnitType {
+  WEIGHT
+  DIMENSION
+  VOLUME
+  COUNT
+}
+
+enum BarcodeType {
+  EAN13
+  UPC
+  CODE128
+  ISBN
+}
+
+enum SpecGroup {
+  GENERAL
+  TECHNICAL
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+  CANCELLED
+}
+
+enum SellerStatus {
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum StoreStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum StorePolicyType {
+  RETURN
+  SHIPPING
+  CANCELLATION
+  PRIVACY
+  TERMS
+}
+
+enum ProductStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  INACTIVE
+  REJECTED
+  ARCHIVED
+  OUT_OF_STOCK
+}
+
+enum ProductVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum ProductType {
+  SIMPLE
+  VARIABLE
+  BUNDLE
+  DIGITAL_PLACEHOLDER
+  SERVICE_PLACEHOLDER
+}
+
+enum ProductCondition {
+  NEW
+  USED
+  REFURBISHED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO_PLACEHOLDER
+  THREE_D_MODEL_PLACEHOLDER
+  VIEW_360_PLACEHOLDER
+}
+
+enum MediaStatus {
+  UPLOADING
+  ACTIVE
+  PROCESSING
+  FAILED
+  DELETED
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  BACKORDER
+  DISCONTINUED
+}
+
+enum StockMovementType {
+  INITIAL_STOCK
+  RESTOCK
+  MANUAL_ADJUSTMENT
+  RESERVATION
+  RELEASE
+  SALE
+  RETURN
+  DAMAGE
+  LOSS
+  CORRECTION
+  TRANSFER_PLACEHOLDER
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum PriceChangeType {
+  INITIAL_PRICE
+  PRICE_UPDATE
+  DISCOUNT_CREATED
+  DISCOUNT_UPDATED
+  DISCOUNT_EXPIRED
+  DISCOUNT_DISABLED
+  DEAL_STARTED
+  DEAL_ENDED
+  ADMIN_ADJUSTMENT
+}
+
+enum CartStatus {
+  ACTIVE
+  ABANDONED
+  CONVERTED
+  EXPIRED
+}
+
+enum AddressLabel {
+  HOME
+  WORK
+  OTHER
+}
+
+enum ShippingZoneCode {
+  CONTIGUOUS_US
+  ALASKA
+  HAWAII
+  US_TERRITORIES
+  MILITARY
+}
+
+enum ShippingClass {
+  STANDARD
+  OVERSIZED
+  HEAVY
+  FRAGILE
+  HAZARDOUS_RESTRICTED
+}
+
+enum CheckoutSessionStatus {
+  DRAFT
+  READY_FOR_PAYMENT
+  EXPIRED
+  ABANDONED
+  CONVERTED
+}
+
+enum TaxRateType {
+  STATE_FLAT
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum OrderEventActor {
+  BUYER
+  SELLER
+  ADMIN
+  SYSTEM
+}
+
+// ==================================================
+// MODELS
+// ==================================================
+
+model User {
+  id                   Int           @id @default(autoincrement())
+  firstName            String
+  lastName             String
+  email                String        @unique
+  password             String
+  role                 Role          @default(BUYER)
+  status               AccountStatus @default(ACTIVE)
+  phone                String?
+  emailVerified        Boolean       @default(false)
+  emailVerifiedAt      DateTime?
+  profileImage         String?
+  dateOfBirth          DateTime?
+  gender               String?
+  preferredLanguage    String        @default("en")
+  timeZone             String?
+  lastLoginAt          DateTime?
+  lastPasswordChangeAt DateTime?
+  deactivatedAt        DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  verificationTokens VerificationToken[]
+  refreshTokens      RefreshToken[]
+
+  sellerApplications   SellerApplication[] @relation("Applicant")
+  reviewedApplications SellerApplication[] @relation("Reviewer")
+  seller               Seller?
+  reviewedProducts     Product[]           @relation("ProductReviewer")
+  cart                 Cart[]
+  addresses            Address[]
+  CheckoutSession      CheckoutSession[]
+  Order                Order[]
+
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+model VerificationToken {
+  id        Int                   @id @default(autoincrement())
+  tokenHash String                @unique
+  userId    Int
+  type      VerificationTokenType @default(EMAIL_VERIFICATION)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime              @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("verification_tokens")
+}
+
+model RefreshToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  userId    Int
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Category {
+  id               Int       @id @default(autoincrement())
+  name             String
+  slug             String    @unique
+  description      String?
+  parentId         Int?
+  level            Int       @default(0)
+  sortOrder        Int       @default(0)
+  icon             String?
+  image            String?
+  banner           String?
+  isActive         Boolean   @default(true)
+  isFeatured       Boolean   @default(false)
+  showOnHomepage   Boolean   @default(false)
+  showInNavigation Boolean   @default(true)
+  seoTitle         String?
+  seoDescription   String?
+  seoKeywords      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  parent   Category?       @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[]      @relation("CategoryHierarchy")
+  brands   BrandCategory[]
+
+  categoryAttributes CategoryAttribute[]
+  specTemplates      ProductSpecificationTemplate[]
+  products           Product[]
+
+  @@index([parentId])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([showOnHomepage])
+  @@index([showInNavigation])
+  @@map("categories")
+}
+
+model Brand {
+  id               Int         @id @default(autoincrement())
+  name             String
+  slug             String      @unique
+  description      String?
+  shortDescription String?
+  logo             String?
+  banner           String?
+  websiteUrl       String?
+  country          String?
+  isVerified       Boolean     @default(false)
+  isFeatured       Boolean     @default(false)
+  showOnHomepage   Boolean     @default(false)
+  displayOrder     Int         @default(0)
+  status           BrandStatus @default(ACTIVE)
+  seoTitle         String?
+  seoDescription   String?
+  seoKeywords      String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+
+  categories BrandCategory[]
+  products   Product[]
+
+  @@index([status])
+  @@index([isFeatured])
+  @@index([showOnHomepage])
+  @@index([isVerified])
+  @@map("brands")
+}
+
+model BrandCategory {
+  id         Int @id @default(autoincrement())
+  brandId    Int
+  categoryId Int
+
+  brand    Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, categoryId])
+  @@map("brand_categories")
+}
+
+model AttributeGroup {
+  id           Int      @id @default(autoincrement())
+  name         String
+  slug         String   @unique
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attributes Attribute[]
+
+  @@map("attribute_groups")
+}
+
+model Attribute {
+  id                 Int           @id @default(autoincrement())
+  groupId            Int?
+  name               String
+  code               String        @unique
+  type               AttributeType
+  unitType           UnitType?
+  isRequired         Boolean       @default(false)
+  isVariantAttribute Boolean       @default(false)
+  isFilterable       Boolean       @default(false)
+  displayOrder       Int           @default(0)
+  validationRules    String?
+  isActive           Boolean       @default(true)
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  group              AttributeGroup?             @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  values             AttributeValue[]
+  categoryAttributes CategoryAttribute[]
+  variantOptions     VariantOption[]
+  specTemplateItems  SpecificationTemplateItem[]
+  productValues      ProductAttributeValue[]
+
+  @@index([groupId])
+  @@index([type])
+  @@map("attributes")
+}
+
+model AttributeValue {
+  id           Int      @id @default(autoincrement())
+  attributeId  Int
+  value        String
+  label        String
+  colorHex     String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attribute      Attribute               @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  variantOptions VariantOption[]
+  productValues  ProductAttributeValue[]
+
+  @@unique([attributeId, value])
+  @@index([attributeId])
+  @@map("attribute_values")
+}
+
+model CategoryAttribute {
+  id           Int      @id @default(autoincrement())
+  categoryId   Int
+  attributeId  Int
+  isRequired   Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  attribute Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, attributeId])
+  @@index([categoryId])
+  @@index([attributeId])
+  @@map("category_attributes")
+}
+
+model MeasurementUnit {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String   @unique
+  unitType  UnitType
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([unitType])
+  @@map("measurement_units")
+}
+
+model VariantOption {
+  id               Int      @id @default(autoincrement())
+  attributeId      Int
+  attributeValueId Int
+  createdAt        DateTime @default(now())
+
+  attribute      Attribute                  @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  attributeValue AttributeValue             @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
+  combinations   VariantCombinationOption[]
+
+  @@unique([attributeId, attributeValueId])
+  @@map("variant_options")
+}
+
+model VariantCombination {
+  id            Int      @id @default(autoincrement())
+  productId     Int?
+  name          String
+  sku           String?
+  barcode       String?
+  price         Float? // legacy display field, deprecated — see Phase 25 note
+  weight        Float?
+  weightUnit    String?
+  length        Float?
+  width         Float?
+  height        Float?
+  dimensionUnit String?
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product   Product?                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  options   VariantCombinationOption[]
+  media     ProductMedia[]
+  inventory Inventory?
+  pricing   ProductPrice?
+  discounts Discount[]
+  cartItems CartItem[]
+  OrderItem OrderItem[]
+
+  @@index([productId])
+  @@map("variant_combinations")
+}
+
+model VariantCombinationOption {
+  id              Int @id @default(autoincrement())
+  combinationId   Int
+  variantOptionId Int
+
+  combination   VariantCombination @relation(fields: [combinationId], references: [id], onDelete: Cascade)
+  variantOption VariantOption      @relation(fields: [variantOptionId], references: [id], onDelete: Cascade)
+
+  @@unique([combinationId, variantOptionId])
+  @@map("variant_combination_options")
+}
+
+model ProductSpecificationTemplate {
+  id         Int      @id @default(autoincrement())
+  name       String
+  categoryId Int?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category Category?                   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  items    SpecificationTemplateItem[]
+
+  @@map("product_specification_templates")
+}
+
+model SpecificationTemplateItem {
+  id           Int       @id @default(autoincrement())
+  templateId   Int
+  label        String
+  attributeId  Int?
+  group        SpecGroup @default(GENERAL)
+  displayOrder Int       @default(0)
+
+  template  ProductSpecificationTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  attribute Attribute?                   @relation(fields: [attributeId], references: [id], onDelete: SetNull)
+
+  @@map("specification_template_items")
+}
+
+model SKUConfiguration {
+  id        Int      @id @default(autoincrement())
+  name      String
+  pattern   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sku_configurations")
+}
+
+model BarcodeConfiguration {
+  id        Int         @id @default(autoincrement())
+  name      String
+  type      BarcodeType
+  prefix    String?
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("barcode_configurations")
+}
+
+model SellerApplication {
+  id                         Int               @id @default(autoincrement())
+  userId                     Int
+  businessName               String
+  businessType               String
+  businessDescription        String?
+  contactName                String
+  contactEmail               String
+  contactPhone               String
+  country                    String
+  stateProvince              String
+  city                       String
+  address                    String
+  postalCode                 String
+  taxInformation             String?
+  businessRegistrationNumber String?
+  status                     ApplicationStatus @default(DRAFT)
+  termsAccepted              Boolean           @default(false)
+  rejectionReason            String?
+  adminNotes                 String?
+  submittedAt                DateTime?
+  reviewedAt                 DateTime?
+  reviewedById               Int?
+  approvedAt                 DateTime?
+  rejectedAt                 DateTime?
+  cancelledAt                DateTime?
+  suspendedAt                DateTime?
+  version                    Int               @default(1)
+  createdAt                  DateTime          @default(now())
+  updatedAt                  DateTime          @updatedAt
+  deletedAt                  DateTime?
+
+  applicant  User  @relation("Applicant", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("Reviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  auditEvents SellerApplicationAuditEvent[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("seller_applications")
+}
+
+model SellerApplicationAuditEvent {
+  id            Int      @id @default(autoincrement())
+  applicationId Int
+  actorId       Int?
+  action        String
+  metadata      String?
+  createdAt     DateTime @default(now())
+
+  application SellerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("seller_application_audit_events")
+}
+
+model Seller {
+  id          Int          @id @default(autoincrement())
+  userId      Int          @unique
+  status      SellerStatus @default(ACTIVE)
+  approvedAt  DateTime?
+  suspendedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store            Store?
+  products         Product[]
+  shippingSettings SellerShippingSettings?
+  shippingRates    ShippingRate[]
+  Order            Order[]
+
+  @@map("sellers")
+}
+
+model Store {
+  id                     Int         @id @default(autoincrement())
+  sellerId               Int         @unique
+  name                   String
+  slug                   String      @unique
+  shortDescription       String?
+  description            String?
+  logo                   String?
+  banner                 String?
+  icon                   String?
+  email                  String?
+  phone                  String?
+  website                String?
+  country                String?
+  stateProvince          String?
+  city                   String?
+  address                String?
+  postalCode             String?
+  status                 StoreStatus @default(DRAFT)
+  isFeatured             Boolean     @default(false)
+  showContactInformation Boolean     @default(true)
+  seoTitle               String?
+  seoDescription         String?
+  version                Int         @default(1)
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+  deletedAt              DateTime?
+
+  seller      Seller            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  policies    StorePolicy[]
+  auditEvents StoreAuditEvent[]
+  products    Product[]
+  Order       Order[]
+
+  @@index([status])
+  @@index([isFeatured])
+  @@map("stores")
+}
+
+model StorePolicy {
+  id        Int             @id @default(autoincrement())
+  storeId   Int
+  type      StorePolicyType
+  content   String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, type])
+  @@map("store_policies")
+}
+
+model StoreAuditEvent {
+  id        Int      @id @default(autoincrement())
+  storeId   Int
+  actorId   Int?
+  action    String
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@map("store_audit_events")
+}
+
+// -------------------- Product --------------------
+
+model Product {
+  id                  Int               @id @default(autoincrement())
+  sellerId            Int
+  storeId             Int
+  categoryId          Int
+  brandId             Int?
+  name                String
+  slug                String            @unique
+  shortDescription    String?
+  description         String?
+  status              ProductStatus     @default(DRAFT)
+  visibility          ProductVisibility @default(PUBLIC)
+  productType         ProductType       @default(SIMPLE)
+  condition           ProductCondition  @default(NEW)
+  sku                 String?
+  barcode             String?
+  modelNumber         String?
+  manufacturer        String?
+  countryOfOrigin     String?
+  warrantyInformation String?
+  weight              Float?
+  weightUnit          String?
+  length              Float?
+  width               Float?
+  height              Float?
+  dimensionUnit       String?
+  seoTitle            String?
+  seoDescription      String?
+  seoKeywords         String?
+  rejectionReason     String?
+  adminNotes          String?
+  version             Int               @default(1)
+  submittedAt         DateTime?
+  publishedAt         DateTime?
+  reviewedAt          DateTime?
+  reviewedById        Int?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  deletedAt           DateTime?
+
+  seller     Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id])
+  brand      Brand?   @relation(fields: [brandId], references: [id])
+  reviewedBy User?    @relation("ProductReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  attributeValues ProductAttributeValue[]
+  specifications  ProductSpecificationValue[]
+  variants        VariantCombination[]
+  auditEvents     ProductAuditEvent[]
+  media           ProductMedia[]
+  inventory       Inventory[]
+  pricing         ProductPrice[]
+  discounts       Discount[]
+  cartItems       CartItem[]
+  OrderItem       OrderItem[]
+
+  @@unique([sellerId, sku])
+  @@unique([sellerId, barcode])
+  @@index([status])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([sellerId])
+  @@index([storeId])
+  @@map("products")
+}
+
+model ProductAttributeValue {
+  id               Int      @id @default(autoincrement())
+  productId        Int
+  attributeId      Int
+  attributeValueId Int?
+  value            String?
+  createdAt        DateTime @default(now())
+
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attribute      Attribute       @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  attributeValue AttributeValue? @relation(fields: [attributeValueId], references: [id], onDelete: SetNull)
+
+  @@unique([productId, attributeId])
+  @@map("product_attribute_values")
+}
+
+model ProductSpecificationValue {
+  id           Int       @id @default(autoincrement())
+  productId    Int
+  label        String
+  value        String
+  group        SpecGroup @default(GENERAL)
+  displayOrder Int       @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_specification_values")
+}
+
+model ProductAuditEvent {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  actorId   Int?
+  action    String
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_audit_events")
+}
+
+model ProductMedia {
+  id               Int         @id @default(autoincrement())
+  productId        Int
+  variantId        Int?
+  type             MediaType   @default(IMAGE)
+  url              String
+  storageKey       String
+  originalFileName String
+  fileName         String
+  mimeType         String
+  fileSize         Int
+  width            Int?
+  height           Int?
+  altText          String?
+  title            String?
+  sortOrder        Int         @default(0)
+  isPrimary        Boolean     @default(false)
+  status           MediaStatus @default(ACTIVE)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deletedAt        DateTime?
+
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant VariantCombination? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@index([variantId])
+  @@index([sortOrder])
+  @@index([isPrimary])
+  @@index([status])
+  @@map("product_media")
+}
+
+model Inventory {
+  id                Int             @id @default(autoincrement())
+  productId         Int
+  variantId         Int?            @unique
+  sellerId          Int
+  storeId           Int
+  sku               String?
+  quantity          Int             @default(0)
+  reservedQuantity  Int             @default(0)
+  lowStockThreshold Int             @default(5)
+  reorderPoint      Int             @default(0)
+  status            InventoryStatus @default(OUT_OF_STOCK)
+  allowBackorder    Boolean         @default(false)
+  version           Int             @default(1)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime?
+
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant VariantCombination? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  movements StockMovement[]
+
+  // Only one inventory record per simple product (variantId null),
+  // enforced at the service layer (partial-unique on nullable column
+  // isn't portable across all Postgres setups the same way); each
+  // variant gets its own via the @unique on variantId above.
+  @@index([productId])
+  @@index([variantId])
+  @@index([sellerId])
+  @@index([storeId])
+  @@index([sku])
+  @@index([status])
+  @@map("inventories")
+}
+
+model StockMovement {
+  id               Int               @id @default(autoincrement())
+  inventoryId      Int
+  type             StockMovementType
+  quantity         Int
+  previousQuantity Int
+  newQuantity      Int
+  reason           String?
+  referenceType    String?
+  referenceId      Int?
+  performedById    Int?
+  createdAt        DateTime          @default(now())
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([referenceId])
+  @@map("stock_movements")
+}
+
+model ProductPrice {
+  id             Int       @id @default(autoincrement())
+  productId      Int
+  variantId      Int?      @unique
+  sellerId       Int
+  storeId        Int
+  currency       String    @default("PKR")
+  basePrice      Decimal   @db.Decimal(12, 2)
+  compareAtPrice Decimal?  @db.Decimal(12, 2)
+  costPrice      Decimal?  @db.Decimal(12, 2) // seller-only, never public
+  minimumPrice   Decimal?  @db.Decimal(12, 2)
+  maximumPrice   Decimal?  @db.Decimal(12, 2)
+  isActive       Boolean   @default(true)
+  version        Int       @default(1)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant VariantCombination? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  discounts Discount[]
+  history   PriceHistory[]
+
+  // One ProductPrice per simple product (variantId null) is enforced
+  // at the service layer, mirroring Phase 24's Inventory pattern —
+  // partial-unique on a nullable column isn't portably declarable
+  // here. Per-variant uniqueness IS enforced at the DB level via the
+  // @unique on variantId above.
+  @@index([productId])
+  @@index([variantId])
+  @@index([sellerId])
+  @@index([storeId])
+  @@index([currency])
+  @@index([isActive])
+  @@map("product_prices")
+}
+
+model Deal {
+  id          Int       @id @default(autoincrement())
+  sellerId    Int? // null reserved for future platform-level deals
+  name        String
+  description String?
+  startAt     DateTime
+  endAt       DateTime
+  isEnabled   Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  discounts Discount[]
+
+  @@index([sellerId])
+  @@index([startAt])
+  @@index([endAt])
+  @@map("deals")
+}
+
+model Discount {
+  id              Int          @id @default(autoincrement())
+  dealId          Int?
+  priceId         Int
+  productId       Int
+  variantId       Int?
+  sellerId        Int
+  storeId         Int
+  type            DiscountType
+  value           Decimal      @db.Decimal(12, 2)
+  startAt         DateTime?
+  endAt           DateTime?
+  isEnabled       Boolean      @default(true)
+  maxUses         Int?
+  currentUses     Int          @default(0)
+  minimumQuantity Int?
+  maximumQuantity Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  deletedAt       DateTime?
+
+  deal    Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  price   ProductPrice        @relation(fields: [priceId], references: [id], onDelete: Cascade)
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant VariantCombination? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@index([dealId])
+  @@index([priceId])
+  @@index([productId])
+  @@index([variantId])
+  @@index([sellerId])
+  @@index([storeId])
+  @@index([startAt])
+  @@index([endAt])
+  @@index([isEnabled])
+  @@map("discounts")
+}
+
+model PriceHistory {
+  id            Int      @id @default(autoincrement())
+  priceId       Int
+  changeType    String
+  field         String?
+  previousValue Decimal? @db.Decimal(12, 2)
+  newValue      Decimal? @db.Decimal(12, 2)
+  reason        String?
+  changedById   Int?
+  createdAt     DateTime @default(now())
+
+  price ProductPrice @relation(fields: [priceId], references: [id], onDelete: Cascade)
+
+  @@index([priceId])
+  @@index([createdAt])
+  @@map("price_history")
+}
+
+model Cart {
+  id                Int        @id @default(autoincrement())
+  userId            Int?
+  sessionId         String?    @unique
+  status            CartStatus @default(ACTIVE)
+  currency          String     @default("USD")
+  selectedAddressId Int?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  expiresAt         DateTime?
+
+  user               User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  selectedAddress    Address?                @relation(fields: [selectedAddressId], references: [id], onDelete: SetNull)
+  items              CartItem[]
+  shippingSelections CartShippingSelection[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([sessionId])
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  variantId Int?
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart    Cart                @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant VariantCombination? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  // Prevents duplicate lines for the same product OR the same
+  // variant within one cart. Two partial-style uniques aren't
+  // directly expressible for "variantId nullable" in one clean
+  // @@unique, so simple-product duplicate prevention is additionally
+  // enforced at the service layer (see cart.service.js) while
+  // variant-line uniqueness is enforced at the DB level here.
+  @@unique([cartId, productId, variantId])
+  @@index([cartId])
+  @@index([productId])
+  @@index([variantId])
+  @@map("cart_items")
+}
+
+model Address {
+  id                   Int          @id @default(autoincrement())
+  userId               Int
+  label                AddressLabel @default(HOME)
+  firstName            String
+  lastName             String
+  companyName          String?
+  addressLine1         String
+  addressLine2         String?
+  city                 String
+  stateCode            String // e.g. "CA" — validated against the fixed US_STATES list
+  stateName            String // e.g. "California" — denormalized for display without a join
+  postalCode           String // 5-digit ZIP or ZIP+4
+  countryCode          String       @default("US")
+  phone                String
+  deliveryInstructions String?
+  isDefault            Boolean      @default(false)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  deletedAt            DateTime?
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carts Cart[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@index([countryCode])
+  @@index([stateCode])
+  @@index([postalCode])
+  @@map("addresses")
+}
+
+model ShippingMethod {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique // e.g. STANDARD, EXPRESS, FREE, LOCAL_DELIVERY
+  name            String
+  description     String?
+  deliveryMinDays Int
+  deliveryMaxDays Int
+  isActive        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  rates      ShippingRate[]
+  selections CartShippingSelection[]
+
+  @@map("shipping_methods")
+}
+
+model SellerShippingSettings {
+  id                    Int      @id @default(autoincrement())
+  sellerId              Int      @unique
+  processingMinDays     Int      @default(1)
+  processingMaxDays     Int      @default(2)
+  freeShippingThreshold Decimal? @db.Decimal(12, 2)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@map("seller_shipping_settings")
+}
+
+model ShippingRate {
+  id                    Int              @id @default(autoincrement())
+  sellerId              Int? // null = platform default fallback rate, admin-managed
+  shippingMethodId      Int
+  zone                  ShippingZoneCode
+  flatRate              Decimal          @db.Decimal(12, 2)
+  freeShippingThreshold Decimal?         @db.Decimal(12, 2) // overrides seller-level threshold for this method+zone
+  isActive              Boolean          @default(true)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  seller Seller?        @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  method ShippingMethod @relation(fields: [shippingMethodId], references: [id], onDelete: Cascade)
+
+  @@index([sellerId])
+  @@index([shippingMethodId])
+  @@index([zone])
+  @@map("shipping_rates")
+}
+
+model CartShippingSelection {
+  id               Int      @id @default(autoincrement())
+  cartId           Int
+  storeId          Int
+  shippingMethodId Int
+  price            Decimal  @db.Decimal(12, 2)
+  currency         String   @default("USD")
+  minDays          Int
+  maxDays          Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  cart   Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  method ShippingMethod @relation(fields: [shippingMethodId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, storeId])
+  @@index([cartId])
+  @@map("cart_shipping_selections")
+}
+
+model StateTaxRate {
+  id        Int         @id @default(autoincrement())
+  stateCode String      @unique
+  rate      Decimal     @db.Decimal(6, 4) // e.g. 0.0725 = 7.25%
+  type      TaxRateType @default(STATE_FLAT)
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([stateCode])
+  @@map("state_tax_rates")
+}
+
+model CheckoutSession {
+  id                   Int                   @id @default(autoincrement())
+  userId               Int
+  cartId               Int
+  status               CheckoutSessionStatus @default(DRAFT)
+  addressId            Int
+  currency             String                @default("USD")
+  itemsSubtotal        Decimal               @db.Decimal(12, 2)
+  discountTotal        Decimal               @db.Decimal(12, 2)
+  shippingTotal        Decimal               @db.Decimal(12, 2)
+  taxTotal             Decimal               @db.Decimal(12, 2)
+  grandTotal           Decimal               @db.Decimal(12, 2)
+  taxStateCode         String
+  taxRateSnapshot      Decimal               @db.Decimal(6, 4)
+  snapshotJson         String // full immutable line/shipping/tax breakdown, JSON-stringified
+  reservationExpiresAt DateTime
+  expiresAt            DateTime
+  convertedAt          DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+
+  user         User                           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservations CheckoutInventoryReservation[]
+  Order        Order[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("checkout_sessions")
+}
+
+model CheckoutInventoryReservation {
+  id                Int       @id @default(autoincrement())
+  checkoutSessionId Int
+  inventoryId       Int
+  quantity          Int
+  releasedAt        DateTime?
+  createdAt         DateTime  @default(now())
+
+  session CheckoutSession @relation(fields: [checkoutSessionId], references: [id], onDelete: Cascade)
+
+  @@index([checkoutSessionId])
+  @@index([inventoryId])
+  @@map("checkout_inventory_reservations")
+}
+
+model Order {
+  id                Int           @id @default(autoincrement())
+  orderNumber       String        @unique // human-readable, e.g. ORD-20260810-00001
+  checkoutSessionId Int
+  userId            Int
+  sellerId          Int
+  storeId           Int
+  status            OrderStatus   @default(PENDING_PAYMENT)
+  paymentStatus     PaymentStatus @default(PENDING)
+  currency          String        @default("USD")
+
+  itemsSubtotal Decimal @db.Decimal(12, 2)
+  discountTotal Decimal @db.Decimal(12, 2)
+  shippingTotal Decimal @db.Decimal(12, 2)
+  taxTotal      Decimal @db.Decimal(12, 2)
+  grandTotal    Decimal @db.Decimal(12, 2)
+
+  shippingMethodCode String
+  shippingMethodName String
+  estimatedMinDays   Int
+  estimatedMaxDays   Int
+
+  // Immutable address snapshot — NEVER a live FK to Address (Phase
+  // 27's Address rows are mutable/reusable; an order must preserve
+  // exactly what shipped, even if the customer later edits/deletes
+  // that saved address).
+  shipFirstName    String
+  shipLastName     String
+  shipCompanyName  String?
+  shipAddressLine1 String
+  shipAddressLine2 String?
+  shipCity         String
+  shipStateCode    String
+  shipPostalCode   String
+  shipCountryCode  String  @default("US")
+  shipPhone        String
+
+  cancelledAt  DateTime?
+  cancelReason String?
+  deliveredAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  checkoutSession CheckoutSession @relation(fields: [checkoutSessionId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+  seller          Seller          @relation(fields: [sellerId], references: [id])
+  store           Store           @relation(fields: [storeId], references: [id])
+
+  items  OrderItem[]
+  events OrderStatusEvent[]
+
+  @@index([userId])
+  @@index([sellerId])
+  @@index([storeId])
+  @@index([status])
+  @@index([checkoutSessionId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          Int  @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+  variantId   Int?
+  inventoryId Int
+
+  // Immutable product snapshot — never joins live Product for
+  // historical display, since name/price/image can change after purchase.
+  productName  String
+  variantName  String?
+  sku          String?
+  unitPrice    Decimal @db.Decimal(12, 2)
+  quantity     Int
+  lineSubtotal Decimal @db.Decimal(12, 2)
+  imageUrl     String?
+
+  createdAt DateTime @default(now())
+
+  order   Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product             @relation(fields: [productId], references: [id])
+  variant VariantCombination? @relation(fields: [variantId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([inventoryId])
+  @@map("order_items")
+}
+
+model OrderStatusEvent {
+  id         Int             @id @default(autoincrement())
+  orderId    Int
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  actor      OrderEventActor
+  actorId    Int?
+  note       String?
+  createdAt  DateTime        @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_status_events")
+}
+
+model OrderNumberSequence {
+  id        Int      @id @default(autoincrement())
+  dateKey   String   @unique // e.g. "20260810"
+  lastValue Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@map("order_number_sequences")
+}

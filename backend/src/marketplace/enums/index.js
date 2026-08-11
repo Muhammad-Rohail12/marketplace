@@ -1,0 +1,17 @@
+module.exports = {
+  ProductStatus: require('./productStatus.enum'),
+  SellerStatus: require('./sellerStatus.enum'),
+  OrderStatus: require('./orderStatus.enum'),
+  InventoryStatus: require('./inventoryStatus.enum'),
+  ReviewStatus: require('./reviewStatus.enum'),
+  PaymentStatus: require('./paymentStatus.enum'),
+  ShipmentStatus: require('./shipmentStatus.enum'),
+  DiscountType: require('./discountType.enum'),
+  CouponType: require('./couponType.enum'),
+  MediaType: require('./mediaType.enum'),
+  StockMovementType: require('./stockMovementType.enum'),
+  VisibilityStatus: require('./visibilityStatus.enum'),
+  Currency: require('./currency.enum'),
+  Country: require('./country.enum'),
+  Language: require('./language.enum'),
+};

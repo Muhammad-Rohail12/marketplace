@@ -1,0 +1,15 @@
+module.exports = {
+  NAME_MAX_LENGTH: 100,
+  CODE_MAX_LENGTH: 50,
+  VALUE_MAX_LENGTH: 100,
+  SKU_REGEX: /^[A-Za-z0-9-]{3,40}$/,
+  ATTRIBUTE_TYPES: [
+    'TEXT', 'NUMBER', 'DECIMAL', 'BOOLEAN', 'COLOR', 'SIZE',
+    'DROPDOWN', 'MULTISELECT', 'DATE', 'MEASUREMENT', 'URL',
+    'RICH_TEXT', 'IMAGE_REFERENCE',
+  ],
+  UNIT_TYPES: ['WEIGHT', 'DIMENSION', 'VOLUME', 'COUNT'],
+  BARCODE_TYPES: ['EAN13', 'UPC', 'CODE128', 'ISBN'],
+  SPEC_GROUPS: ['GENERAL', 'TECHNICAL'],
+  ALLOWED_SORT_FIELDS: ['name', 'displayOrder', 'createdAt', 'code'],
+};

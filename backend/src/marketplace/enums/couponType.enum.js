@@ -1,0 +1,5 @@
+module.exports = {
+  SINGLE_USE: 'SINGLE_USE',
+  MULTI_USE: 'MULTI_USE',
+  FIRST_ORDER_ONLY: 'FIRST_ORDER_ONLY',
+};

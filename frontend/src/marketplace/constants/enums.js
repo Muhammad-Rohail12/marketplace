@@ -1,0 +1,54 @@
+export const ProductStatus = { DRAFT: 'DRAFT', ACTIVE: 'ACTIVE', OUT_OF_STOCK: 'OUT_OF_STOCK', ARCHIVED: 'ARCHIVED' };
+export const SellerStatus = { PENDING: 'PENDING', APPROVED: 'APPROVED', REJECTED: 'REJECTED', SUSPENDED: 'SUSPENDED' };
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
+};
+export const InventoryStatus = {
+  IN_STOCK: 'IN_STOCK',
+  LOW_STOCK: 'LOW_STOCK',
+  OUT_OF_STOCK: 'OUT_OF_STOCK',
+  DISCONTINUED: 'DISCONTINUED',
+};
+export const ReviewStatus = { PENDING: 'PENDING', APPROVED: 'APPROVED', REJECTED: 'REJECTED', FLAGGED: 'FLAGGED' };
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  AUTHORIZED: 'AUTHORIZED',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED',
+  PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED',
+};
+export const ShipmentStatus = {
+  NOT_SHIPPED: 'NOT_SHIPPED',
+  LABEL_CREATED: 'LABEL_CREATED',
+  IN_TRANSIT: 'IN_TRANSIT',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  RETURNED: 'RETURNED',
+};
+export const DiscountType = { PERCENTAGE: 'PERCENTAGE', FIXED_AMOUNT: 'FIXED_AMOUNT' };
+export const CouponType = { SINGLE_USE: 'SINGLE_USE', MULTI_USE: 'MULTI_USE', FIRST_ORDER_ONLY: 'FIRST_ORDER_ONLY' };
+export const MediaType = {
+  PRODUCT_IMAGE: 'PRODUCT_IMAGE',
+  BRAND_LOGO: 'BRAND_LOGO',
+  SELLER_LOGO: 'SELLER_LOGO',
+  STORE_BANNER: 'STORE_BANNER',
+  CATEGORY_IMAGE: 'CATEGORY_IMAGE',
+};
+export const StockMovementType = {
+  RESTOCK: 'RESTOCK',
+  SALE: 'SALE',
+  RETURN: 'RETURN',
+  ADJUSTMENT: 'ADJUSTMENT',
+  DAMAGED: 'DAMAGED',
+};
+export const VisibilityStatus = { PUBLIC: 'PUBLIC', HIDDEN: 'HIDDEN', SCHEDULED: 'SCHEDULED' };
+export const Currency = { USD: 'USD', PKR: 'PKR', EUR: 'EUR', GBP: 'GBP' };
+export const Country = { US: 'US', PK: 'PK', GB: 'GB', AE: 'AE' };
+export const Language = { EN: 'en' };

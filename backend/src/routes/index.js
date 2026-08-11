@@ -1,15 +1,58 @@
 const express = require('express');
-const healthRoutes = require('./healthRoutes');
-
+const healthRoutes = require('./health.routes');
+const testRoutes = require('./test.routes');
+const authRoutes = require('./auth.routes');
+const userRoutes = require('./user.routes');
+const rbacDemoRoutes = require('./rbacDemo.routes');
+const categoryRoutes = require('./category.routes');
+const brandRoutes = require('./brand.routes');
+const pimRoutes = require('./pim.routes');
+const sellerApplicationRoutes = require('./sellerApplication.routes');
+const sellerRoutes = require('./seller.routes');
+const storeRoutes = require('./store.routes');
+const sellerProductRoutes = require('./sellerProduct.routes');
+const productRoutes = require('./product.routes');
+const sellerInventoryRoutes = require('./sellerInventory.routes');
+const inventoryRoutes = require('./inventory.routes');
+const sellerPricingRoutes = require('./sellerPricing.routes');
+const pricingRoutes = require('./pricing.routes');
+const cartRoutes = require('./cart.routes');
+const addressRoutes = require('./address.routes');
+const shippingRoutes = require('./shipping.routes');
+const sellerShippingRoutes = require('./sellerShipping.routes');
+const checkoutRoutes = require('./checkout.routes');
 const router = express.Router();
+const orderRoutes = require('./order.routes');
+const sellerOrderRoutes = require('./sellerOrder.routes');
+const adminOrderRoutes = require('./adminOrder.routes');
 
-// Mounted future routes will follow this pattern:
-// router.use('/auth', authRoutes);
-// router.use('/users', userRoutes);
-// router.use('/products', productRoutes);
-// router.use('/categories', categoryRoutes);
+router.use('/health', healthRoutes);
+router.use('/test', testRoutes);
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/demo', rbacDemoRoutes);
+router.use('/categories', categoryRoutes);
+router.use('/brands', brandRoutes);
+router.use('/pim', pimRoutes);
+router.use('/seller-applications', sellerApplicationRoutes);
+router.use('/seller', sellerRoutes);
+router.use('/seller/products', sellerProductRoutes);
+router.use('/seller/inventory', sellerInventoryRoutes);
+router.use('/seller/pricing', sellerPricingRoutes);
+router.use('/stores', storeRoutes);
+router.use('/products', productRoutes);
+router.use('/inventory', inventoryRoutes);
+router.use('/pricing', pricingRoutes);
+router.use('/cart', cartRoutes);
+router.use('/addresses', addressRoutes);
+router.use('/shipping', shippingRoutes);
+router.use('/seller/shipping', sellerShippingRoutes);
+router.use('/checkout', checkoutRoutes);
+router.use('/orders', orderRoutes);
+router.use('/seller/orders', sellerOrderRoutes);
+router.use('/admin/orders', adminOrderRoutes);
+// Future routes plug in here without modifying app.js:
+// router.use('/checkout', checkoutRoutes);
 // router.use('/orders', orderRoutes);
-
-router.use('/', healthRoutes);
 
 module.exports = router;

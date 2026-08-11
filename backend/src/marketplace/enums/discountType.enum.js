@@ -1,0 +1,4 @@
+module.exports = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED_AMOUNT: 'FIXED_AMOUNT',
+};

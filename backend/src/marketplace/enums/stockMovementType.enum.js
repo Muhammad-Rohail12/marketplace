@@ -1,0 +1,7 @@
+module.exports = {
+  RESTOCK: 'RESTOCK',
+  SALE: 'SALE',
+  RETURN: 'RETURN',
+  ADJUSTMENT: 'ADJUSTMENT',
+  DAMAGED: 'DAMAGED',
+};

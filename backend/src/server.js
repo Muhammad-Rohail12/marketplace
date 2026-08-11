@@ -1,31 +1,52 @@
-const express = require('express');
-const cors = require('cors');
-const env = require('./config/env');
-const apiRoutes = require('./routes/index');
-const notFound = require('./middlewares/notFound');
-const errorHandler = require('./middlewares/errorHandler');
+const app = require('./app');
+const config = require('./config');
+const prisma = require('./database/prismaClient');
+const logger = require('./utils/logger');
 
-const app = express();
+let server;
 
-// Core middleware
-app.use(express.json());
-app.use(
-  cors({
-    origin: env.frontendUrl,
-    credentials: true,
-  })
-);
+const startServer = async () => {
+  try {
+    await prisma.$connect();
+    logger.info('Database connected successfully.');
 
-// API routes
-app.use('/api', apiRoutes);
+    server = app.listen(config.server.port, () => {
+      logger.info(`Marketplace API running on http://localhost:${config.server.port}`);
+      logger.info(`Environment: ${config.server.nodeEnv}`);
+    });
+  } catch (err) {
+    logger.error('Failed to start server:', err);
+    process.exit(1);
+  }
+};
 
-// 404 handler
-app.use(notFound);
+const disconnectPrisma = async () => {
+  try {
+    await prisma.$disconnect();
+    logger.info('Prisma disconnected.');
+  } catch (err) {
+    logger.error('Error disconnecting Prisma:', err);
+  } finally {
+    process.exit(0);
+  }
+};
 
-// Centralized error handler (must be last)
-app.use(errorHandler);
+const gracefulShutdown = (signal) => {
+  logger.info(`${signal} received. Shutting down gracefully...`);
 
-app.listen(env.port, () => {
-  console.log(`Marketplace API running on http://localhost:${env.port}`);
-  console.log(`Environment: ${env.nodeEnv}`);
-});
+  if (server) {
+    server.close(() => {
+      logger.info('HTTP server closed.');
+      disconnectPrisma();
+    });
+  } else {
+    disconnectPrisma();
+  }
+};
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+startServer();
+
+module.exports = server;
