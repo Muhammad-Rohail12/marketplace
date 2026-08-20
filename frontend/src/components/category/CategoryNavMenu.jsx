@@ -26,7 +26,7 @@ export default function CategoryNavMenu() {
             {node.name}
           </Link>
           {node.children?.length > 0 && (
-            <div className="invisible absolute left-0 top-full z-20 min-w-[180px] rounded-md border border-gray-200 bg-white py-2 opacity-0 shadow-dropdown transition-opacity group-hover:visible group-hover:opacity-100 dark:border-gray-800 dark:bg-gray-900">
+            <div className="invisible absolute left-0 top-full z-20 min-w-45 rounded-md border border-gray-200 bg-white py-2 opacity-0 shadow-dropdown transition-opacity group-hover:visible group-hover:opacity-100 dark:border-gray-800 dark:bg-gray-900">
               {node.children.map((child) => (
                 <Link
                   key={child.id}

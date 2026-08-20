@@ -4,7 +4,7 @@ export default function Skeleton({ className = '' }) {
   return (
     <div
       aria-hidden="true"
-      className={cn('animate-pulse rounded-md bg-gray-200 dark:bg-gray-800', className)}
+      className={cn('skeleton-shimmer animate-shimmer rounded-md bg-neutral-200 dark:bg-neutral-800', className)}
     />
   );
 }

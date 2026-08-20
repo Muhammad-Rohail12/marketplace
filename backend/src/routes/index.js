@@ -25,6 +25,10 @@ const router = express.Router();
 const orderRoutes = require('./order.routes');
 const sellerOrderRoutes = require('./sellerOrder.routes');
 const adminOrderRoutes = require('./adminOrder.routes');
+const reviewRoutes = require('./review.routes');
+const wishlistRoutes = require('./wishlist.routes');
+const notificationRoutes = require('./notification.routes');
+const analyticsRoutes = require('./analytics.routes');
 
 router.use('/health', healthRoutes);
 router.use('/test', testRoutes);
@@ -51,6 +55,10 @@ router.use('/checkout', checkoutRoutes);
 router.use('/orders', orderRoutes);
 router.use('/seller/orders', sellerOrderRoutes);
 router.use('/admin/orders', adminOrderRoutes);
+router.use('/reviews', reviewRoutes);
+router.use('/wishlist', wishlistRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/analytics', analyticsRoutes);
 // Future routes plug in here without modifying app.js:
 // router.use('/checkout', checkoutRoutes);
 // router.use('/orders', orderRoutes);

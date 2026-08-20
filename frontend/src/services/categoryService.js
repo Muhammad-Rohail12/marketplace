@@ -33,7 +33,10 @@ export async function getCategoryBreadcrumb(id) {
   return apiClient.get(`${API_ENDPOINTS.CATEGORIES}/${id}/breadcrumb`);
 }
 
-// Multipart create/update — mirrors Phase 14's uploadProfileImage pattern.
+export async function getCategoryChildren(id) {
+  return apiClient.get(`${API_ENDPOINTS.CATEGORIES}/${id}/children`);
+}
+
 async function submitCategoryForm(method, url, formData) {
   const token = tokenStorage.getAccessToken();
 

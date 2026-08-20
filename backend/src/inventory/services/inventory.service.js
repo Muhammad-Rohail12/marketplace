@@ -415,14 +415,34 @@ const listAllInventory = async ({ page, limit, status, search, sort } = {}) => {
       include: {
         product: { select: { name: true, slug: true } },
         variant: { select: { name: true } },
-        seller: { select: { user: { select: { firstName: true, lastName: true, email: true } } } },
-        store: { select: { name: true } },
       },
     }),
     prisma.inventory.count({ where }),
   ]);
 
-  return { items: items.map(withAvailable), meta: buildPaginationMeta({ page: safePage, limit: safeLimit, totalCount }) };
+  const sellerIds = [...new Set(items.map((item) => item.sellerId))];
+  const storeIds = [...new Set(items.map((item) => item.storeId))];
+  const [sellers, stores] = await Promise.all([
+    prisma.seller.findMany({
+      where: { id: { in: sellerIds } },
+      select: { id: true, user: { select: { firstName: true, lastName: true, email: true } } },
+    }),
+    prisma.store.findMany({
+      where: { id: { in: storeIds } },
+      select: { id: true, name: true },
+    }),
+  ]);
+  const sellersById = new Map(sellers.map((seller) => [seller.id, seller]));
+  const storesById = new Map(stores.map((store) => [store.id, store]));
+
+  return {
+    items: items.map((item) => withAvailable({
+      ...item,
+      seller: sellersById.get(item.sellerId) || null,
+      store: storesById.get(item.storeId) || null,
+    })),
+    meta: buildPaginationMeta({ page: safePage, limit: safeLimit, totalCount }),
+  };
 };
 
 const adminAdjustStock = async (adminId, inventoryId, { quantity, reason }) => {

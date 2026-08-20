@@ -6,6 +6,8 @@ const errorCodes = require('../../constants/errorCodes');
 const { STATUS } = require('../../cart/constants/cart.constants');
 const { getShippingOptionsForSeller, resolveZoneFromState } = require('./shippingCalculation.service');
 
+const isProductShippable = (product) => !['DIGITAL_PLACEHOLDER', 'SERVICE_PLACEHOLDER'].includes(product.productType);
+
 // Selecting a shipping option NEVER trusts a client-supplied price —
 // it recomputes the group's subtotal and re-derives valid options
 // server-side, then only accepts the selection if it matches one of
@@ -32,7 +34,7 @@ const selectShippingForGroup = async (userId, { storeId, shippingMethodId }) => 
   if (groupItems.length === 0) {
     throw new AppError('No items from this seller are in your cart', httpStatus.BAD_REQUEST, errorCodes.VALIDATION_FAILED);
   }
-  if (groupItems.some((i) => !i.product.isShippable)) {
+  if (groupItems.some((i) => !isProductShippable(i.product))) {
     throw new AppError('One or more items from this seller cannot be shipped', httpStatus.BAD_REQUEST, errorCodes.PRODUCT_NOT_SHIPPABLE);
   }
 

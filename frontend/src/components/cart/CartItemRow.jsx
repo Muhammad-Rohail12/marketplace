@@ -7,6 +7,7 @@ import { formatMoney } from '@/utils/currencyFormat';
 import QuantitySelector from './QuantitySelector';
 import CartItemWarning from './CartItemWarning';
 import { useCart } from '@/context/CartContext';
+import { addSavedItem } from '@/utils/savedForLater';
 
 export default function CartItemRow({ item, currency }) {
   const { updateItem, removeItem } = useCart();
@@ -30,8 +31,26 @@ export default function CartItemRow({ item, currency }) {
     }
   };
 
+  const handleSaveForLater = async () => {
+    setIsUpdating(true);
+    try {
+      addSavedItem({
+        productId: item.productId,
+        variantId: item.variantId,
+        slug: item.product.slug,
+        name: item.product.name,
+        imageUrl: item.image?.url || null,
+        price: item.pricing.effectivePrice,
+        currency,
+      });
+      await removeItem(item.id); // real backend removal — this is not a fake action
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
-    <div className="flex gap-3 border-b border-gray-100 py-4 dark:border-gray-800">
+    <div className="flex gap-3 border-b border-neutral-100 py-4 dark:border-neutral-900">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={item.image ? resolveImageSrc(item.image.url) : getImageFallback()}
@@ -43,7 +62,7 @@ export default function CartItemRow({ item, currency }) {
         <Link href={`/product/${item.product.slug}`} className="text-sm font-medium hover:text-primary-600">
           {item.product.name}
         </Link>
-        {item.variant && <p className="text-xs text-gray-500">{item.variant.name}</p>}
+        {item.variant && <p className="text-xs text-neutral-500">{item.variant.name}</p>}
 
         <CartItemWarning message={item.warning} />
 
@@ -54,9 +73,14 @@ export default function CartItemRow({ item, currency }) {
             max={item.availability.availableQuantity || 999}
             disabled={isUpdating || !item.availability.isAvailable}
           />
-          <button type="button" onClick={handleRemove} disabled={isUpdating} className="text-xs text-danger-600 hover:underline">
-            Remove
-          </button>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={handleSaveForLater} disabled={isUpdating} className="text-xs text-neutral-500 hover:underline">
+              Save for later
+            </button>
+            <button type="button" onClick={handleRemove} disabled={isUpdating} className="text-xs text-danger-600 hover:underline">
+              Remove
+            </button>
+          </div>
         </div>
       </div>
 
@@ -64,7 +88,7 @@ export default function CartItemRow({ item, currency }) {
         <div className="text-right">
           <p className="font-semibold">{formatMoney(item.lineSubtotal, currency)}</p>
           {item.pricing.hasDiscount && (
-            <p className="text-xs text-gray-400 line-through">{formatMoney(item.pricing.unitPrice * item.quantity, currency)}</p>
+            <p className="text-xs text-neutral-400 line-through">{formatMoney(item.pricing.unitPrice * item.quantity, currency)}</p>
           )}
         </div>
       </div>

@@ -5,13 +5,13 @@ export default function QuantitySelector({ quantity, onChange, min = 1, max = 99
   const inc = () => onChange(Math.min(max, quantity + 1));
 
   return (
-    <div className="flex items-center rounded-md border border-gray-300 dark:border-gray-700">
+    <div className="flex items-center rounded-md border border-neutral-300 dark:border-neutral-700">
       <button
         type="button"
         onClick={dec}
         disabled={disabled || quantity <= min}
         aria-label="Decrease quantity"
-        className="px-2 py-1 text-sm disabled:opacity-30"
+        className="flex h-11 w-11 items-center justify-center text-base disabled:opacity-30 sm:h-8 sm:w-8 sm:text-sm"
       >
         −
       </button>
@@ -23,7 +23,7 @@ export default function QuantitySelector({ quantity, onChange, min = 1, max = 99
           const val = parseInt(e.target.value, 10);
           if (!isNaN(val)) onChange(Math.min(max, Math.max(min, val)));
         }}
-        className="w-10 border-x border-gray-300 bg-transparent text-center text-sm dark:border-gray-700"
+        className="h-11 w-12 border-x border-neutral-300 bg-transparent text-center text-sm dark:border-neutral-700 sm:h-8 sm:w-10"
         aria-label="Quantity"
       />
       <button
@@ -31,7 +31,7 @@ export default function QuantitySelector({ quantity, onChange, min = 1, max = 99
         onClick={inc}
         disabled={disabled || quantity >= max}
         aria-label="Increase quantity"
-        className="px-2 py-1 text-sm disabled:opacity-30"
+        className="flex h-11 w-11 items-center justify-center text-base disabled:opacity-30 sm:h-8 sm:w-8 sm:text-sm"
       >
         +
       </button>

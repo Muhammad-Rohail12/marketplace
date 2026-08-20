@@ -478,6 +478,22 @@ const listPublicByCategory = async (categoryId, { page, limit } = {}) => {
   return { items, meta: buildPaginationMeta({ page: safePage, limit: safeLimit, totalCount }) };
 };
 
+// ADD this function alongside the existing listPublicByCategory / listPublicByBrand functions:
+
+const listPublicByStore = async (storeId, { page, limit } = {}) => {
+  const { resolvePagination, buildPaginationMeta } = marketplace.helpers.pagination;
+  const { skip, take, page: safePage, limit: safeLimit } = resolvePagination({ page, limit });
+  const where = { storeId: Number(storeId), status: STATUS.ACTIVE, visibility: 'PUBLIC', deletedAt: null };
+
+  const [items, totalCount] = await Promise.all([
+    prisma.product.findMany({ where, skip, take, orderBy: { createdAt: 'desc' }, select: PUBLIC_SELECT }),
+    prisma.product.count({ where }),
+  ]);
+  return { items, meta: buildPaginationMeta({ page: safePage, limit: safeLimit, totalCount }) };
+};
+
+// ADD listPublicByStore to the module.exports object alongside the existing exports.
+
 const listPublicByBrand = async (brandId, { page, limit } = {}) => {
   const { resolvePagination, buildPaginationMeta } = marketplace.helpers.pagination;
   const { skip, take, page: safePage, limit: safeLimit } = resolvePagination({ page, limit });
@@ -506,5 +522,5 @@ module.exports = {
   createVariant, updateVariant, deleteVariant,
   submitProduct, archiveProduct, duplicateProduct,
   listAllProducts, getProductForAdmin, approveProduct, rejectProduct, deactivateProduct, adminArchiveProduct,
-  getPublicProductBySlug, listPublicByCategory, listPublicByBrand, getRelatedProducts,
+  getPublicProductBySlug, listPublicByCategory, listPublicByBrand, listPublicByStore, getRelatedProducts,
 };

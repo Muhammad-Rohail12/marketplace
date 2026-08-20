@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
   AUTH_FORGOT_PASSWORD: '/auth/forgot-password',
   AUTH_RESET_PASSWORD: '/auth/reset-password',
   USER_PROFILE: '/users/me',
+  USERS: '/users',
   USER_PROFILE_IMAGE: '/users/me/profile-image',
   USER_CHANGE_PASSWORD: '/users/me/change-password',
   USER_DEACTIVATE: '/users/me/deactivate',

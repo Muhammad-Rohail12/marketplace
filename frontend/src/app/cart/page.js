@@ -8,6 +8,8 @@ import CartSummary from '@/components/cart/CartSummary';
 import CartWarnings from '@/components/cart/CartWarnings';
 import EmptyCart from '@/components/cart/EmptyCart';
 import CartDeliveryAddress from '@/components/address/CartDeliveryAddress';
+import SavedForLaterPanel from '@/components/cart/upgrades/SavedForLaterPanel';
+import CartRecommendations from '@/components/cart/upgrades/CartRecommendations';
 import { useCart } from '@/context/CartContext';
 
 function CartPageContent() {
@@ -19,25 +21,30 @@ function CartPageContent() {
   const isEmpty = sellerGroups.length === 0;
 
   return (
-    <div className="container-page flex flex-col gap-6 py-8">
+    <div className="container-page flex flex-col gap-8 py-8">
       <h1 className="text-2xl font-semibold">Shopping Cart</h1>
 
       {isEmpty ? (
         <EmptyCart />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <div className="flex flex-col gap-4">
-            <CartWarnings warnings={cartData.warnings} />
-            {sellerGroups.map((group) => (
-              <CartSellerGroup key={group.store.id} group={group} currency={cartData.summary.currency} onShippingChanged={refreshCart} />
-            ))}
+        <>
+          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div className="flex flex-col gap-4">
+              <CartWarnings warnings={cartData.warnings} />
+              {sellerGroups.map((group) => (
+                <CartSellerGroup key={group.store.id} group={group} currency={cartData.summary.currency} onShippingChanged={refreshCart} />
+              ))}
+              <SavedForLaterPanel />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <CartDeliveryAddress address={cartData.cart?.deliveryAddress} onChanged={refreshCart} />
+              <CartSummary summary={cartData.summary} />
+            </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <CartDeliveryAddress address={cartData.cart?.deliveryAddress} onChanged={refreshCart} />
-            <CartSummary summary={cartData.summary} />
-          </div>
-        </div>
+          <CartRecommendations sellerGroups={sellerGroups} />
+        </>
       )}
     </div>
   );

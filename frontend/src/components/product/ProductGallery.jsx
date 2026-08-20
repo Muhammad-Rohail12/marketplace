@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import ProductMainImage from './ProductMainImage';
-import ProductThumbnailList from './ProductThumbnailList';
-import ImageZoomViewer from './ImageZoomViewer';
+import ProductMainImage from './gallery/ProductMainImage';
+import ProductThumbnailList from './gallery/ProductThumbnailList';
+import ImageZoomViewer from './gallery/ImageZoomViewer';
 
 // Filters to the selected variant's images when one is chosen,
 // falling back to the full product gallery otherwise — supports the

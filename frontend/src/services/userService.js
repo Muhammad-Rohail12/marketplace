@@ -1,11 +1,16 @@
 import { apiClient } from '@/lib/apiClient';
 import { apiConfig } from '@/config/api.config';
 import { API_ENDPOINTS } from '@/constants/apiEndpoints';
+import { buildQueryString } from '@/utils/queryString';
 import { tokenStorage } from '@/lib/tokenStorage';
 import { AUTH_HEADER_NAME } from '@/constants/auth';
 
 export async function getMyProfile() {
   return apiClient.get(API_ENDPOINTS.USER_PROFILE);
+}
+
+export async function listUsers(params = {}) {
+  return apiClient.get(`${API_ENDPOINTS.USERS}${buildQueryString(params)}`);
 }
 
 export async function updateMyProfile(data) {

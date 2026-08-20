@@ -13,6 +13,8 @@ router.get('/category/:categoryId', controller.listByCategory);
 router.get('/brand/:brandId', controller.listByBrand);
 router.get('/:id/related', controller.getRelated);
 router.get('/:id/media', mediaController.getPublicMedia);
+// ADD this route alongside the existing public routes:
+router.get('/store/:storeId', controller.listByStore);
 
 // Admin
 router.get('/', authenticate, authorize(ROLES.ADMIN), controller.listAllProducts);

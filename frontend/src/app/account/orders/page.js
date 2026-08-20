@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AccountLayout from '@/components/account/AccountLayout';
 import Card from '@/components/ui/Card';
 import PageLoader from '@/components/feedback/PageLoader';
 import EmptyState from '@/components/feedback/EmptyState';
@@ -23,7 +23,7 @@ function MyOrdersContent() {
   if (isLoading) return <PageLoader label="Loading orders..." />;
 
   return (
-    <div className="container-page flex flex-col gap-4 py-10">
+    <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">My Orders</h1>
       {orders.length === 0 ? (
         <EmptyState title="No orders yet" message="Your placed orders will appear here." />
@@ -33,7 +33,7 @@ function MyOrdersContent() {
             <Card className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{o.orderNumber}</p>
-                <p className="text-sm text-gray-500">{o.store?.name} · {formatDate(o.createdAt)}</p>
+                <p className="text-sm text-neutral-500">{o.store?.name} · {formatDate(o.createdAt)}</p>
               </div>
               <div className="flex items-center gap-3">
                 <OrderStatusBadge status={o.status} />
@@ -49,10 +49,10 @@ function MyOrdersContent() {
 
 export default function MyOrdersPage() {
   return (
-    <MainLayout>
+    <AccountLayout>
       <ProtectedRoute>
         <MyOrdersContent />
       </ProtectedRoute>
-    </MainLayout>
+    </AccountLayout>
   );
 }

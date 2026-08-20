@@ -31,6 +31,8 @@ export const productService = {
   // Public
   getPublic: (slug) => apiClient.get(`${P}/slug/${encodeURIComponent(slug)}`),
   listByCategory: (categoryId, params = {}) => apiClient.get(`${P}/category/${categoryId}${buildQueryString(params)}`),
+  // ADD this to the productService object, alongside listByCategory / listByBrand:
+listByStore: (storeId, params = {}) => apiClient.get(`${P}/store/${storeId}${buildQueryString(params)}`),
   listByBrand: (brandId, params = {}) => apiClient.get(`${P}/brand/${brandId}${buildQueryString(params)}`),
   getRelated: (id) => apiClient.get(`${P}/${id}/related`),
 };

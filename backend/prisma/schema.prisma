@@ -6,6 +6,23 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  REJECTED
+  FLAGGED
+}
+
+enum NotificationType {
+  ORDER
+  INVENTORY
+  SELLER
+  PRODUCT
+  PROMOTION
+  SECURITY
+  SYSTEM
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -290,6 +307,9 @@ model User {
   addresses            Address[]
   CheckoutSession      CheckoutSession[]
   Order                Order[]
+  reviews              Review[]
+  wishlistItems        WishlistItem[]
+  notifications        Notification[]
 
   @@index([role])
   @@index([status])
@@ -537,6 +557,7 @@ model VariantCombination {
   discounts Discount[]
   cartItems CartItem[]
   OrderItem OrderItem[]
+  reviews  Review[]
 
   @@index([productId])
   @@map("variant_combinations")
@@ -806,6 +827,8 @@ model Product {
   discounts       Discount[]
   cartItems       CartItem[]
   OrderItem       OrderItem[]
+  reviews         Review[]
+  wishlistItems   WishlistItem[]
 
   @@unique([sellerId, sku])
   @@unique([sellerId, barcode])
@@ -1325,6 +1348,7 @@ model Order {
   store           Store           @relation(fields: [storeId], references: [id])
 
   items  OrderItem[]
+  reviews Review[]
   events OrderStatusEvent[]
 
   @@index([userId])
@@ -1387,4 +1411,64 @@ model OrderNumberSequence {
   updatedAt DateTime @updatedAt
 
   @@map("order_number_sequences")
+}
+
+model Review {
+  id                 Int          @id @default(autoincrement())
+  productId          Int
+  userId             Int
+  orderId            Int?
+  variantId          Int?
+  rating             Int
+  title              String?
+  body               String
+  helpfulCount       Int          @default(0)
+  isVerifiedPurchase Boolean      @default(false)
+  images             String?
+  status             ReviewStatus @default(PUBLISHED)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  product Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Order?              @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  variant VariantCombination? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([productId, status])
+  @@index([userId])
+  @@index([orderId])
+  @@unique([userId, productId, orderId])
+  @@map("reviews")
+}
+
+model WishlistItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@map("wishlist_items")
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  title     String
+  message   String
+  readAt    DateTime?
+  metadata  String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([createdAt])
+  @@map("notifications")
 }

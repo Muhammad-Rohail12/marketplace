@@ -11,13 +11,13 @@ export default function MiniCart({ onClose }) {
   const items = cartData?.sellerGroups.flatMap((g) => g.items) || [];
 
   return (
-    <div className="absolute right-0 top-full z-40 mt-2 w-80 rounded-lg border border-gray-200 bg-white p-4 shadow-dropdown dark:border-gray-800 dark:bg-gray-900">
+    <div className="absolute right-0 top-full z-40 mt-2 w-80 rounded-lg border border-neutral-200 bg-white p-4 shadow-dropdown dark:border-neutral-800 dark:bg-neutral-900">
       <h3 className="mb-2 text-sm font-semibold">Your Cart</h3>
 
       {isLoading ? (
-        <p className="text-sm text-gray-500">Loading...</p>
+        <p className="text-sm text-neutral-500">Loading...</p>
       ) : items.length === 0 ? (
-        <p className="text-sm text-gray-500">Your cart is empty.</p>
+        <p className="text-sm text-neutral-500">Your cart is empty.</p>
       ) : (
         <>
           <div className="flex max-h-72 flex-col gap-3 overflow-y-auto">
@@ -31,15 +31,17 @@ export default function MiniCart({ onClose }) {
                 />
                 <div className="flex-1 text-xs">
                   <p className="line-clamp-1 font-medium">{item.product.name}</p>
-                  {item.variant && <p className="text-gray-500">{item.variant.name}</p>}
-                  <p className="text-gray-500">Qty: {item.quantity}</p>
+                  {item.variant && <p className="text-neutral-500">{item.variant.name}</p>}
+                  <p className="text-neutral-500">Qty: {item.quantity}</p>
                 </div>
                 <p className="text-xs font-semibold">{formatMoney(item.lineSubtotal, cartData.summary.currency)}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-2 text-sm font-semibold dark:border-gray-800">
+          {items.length > 5 && <p className="mt-2 text-center text-xs text-neutral-400">+{items.length - 5} more item(s)</p>}
+
+          <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-2 text-sm font-semibold dark:border-neutral-800">
             <span>Subtotal</span>
             <span>{formatMoney(cartData.summary.cartSubtotal, cartData.summary.currency)}</span>
           </div>

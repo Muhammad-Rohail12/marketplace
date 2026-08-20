@@ -1,22 +1,18 @@
 import './globals.css';
 import AppProviders from '@/providers/AppProviders';
-import { seoConfig } from '@/config/seo.config';
+import { buildMetadata } from '@/utils/seo';
 
-export const metadata = {
-  title: {
-    default: seoConfig.defaultTitle,
-    template: seoConfig.titleTemplate,
-  },
-  description: seoConfig.defaultDescription,
-  openGraph: {
-    siteName: seoConfig.openGraph.siteName,
-    type: seoConfig.openGraph.type,
-  },
+export const metadata = buildMetadata({});
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en-US">
       <body>
         <AppProviders>{children}</AppProviders>
       </body>

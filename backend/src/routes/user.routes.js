@@ -5,11 +5,15 @@ const { uploadImage, removeImage } = require('../user/controllers/profileImage.c
 const { changePassword } = require('../user/controllers/changePassword.controller');
 const { deactivateAccount } = require('../user/controllers/deactivateAccount.controller');
 const { uploadProfileImage } = require('../user/middlewares/upload.middleware');
+const authorize = require('../auth/middlewares/authorize.middleware');
+const ROLES = require('../constants/roles');
+const { listUsers } = require('../user/controllers/adminUser.controller');
 
 const router = express.Router();
 
 router.use(authenticate); // every route below requires a valid access token
 
+router.get('/', authorize(ROLES.ADMIN), listUsers);
 router.get('/me', getMyProfile);
 router.patch('/me', updateMyProfile);
 router.post('/me/profile-image', uploadProfileImage, uploadImage);

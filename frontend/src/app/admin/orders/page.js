@@ -6,9 +6,8 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import Card from '@/components/ui/Card';
 import PageLoader from '@/components/feedback/PageLoader';
 import EmptyState from '@/components/feedback/EmptyState';
-import OrderStatusBadge from '@/components/order/OrderStatusBadge';
+import AdminOrdersTable from '@/components/admin/orders/AdminOrdersTable';
 import { orderService } from '@/services/orderService';
-import { formatMoney } from '@/utils/currencyFormat';
 import { ROLES } from '@/constants/roles';
 
 function AdminOrdersContent() {
@@ -24,22 +23,13 @@ function AdminOrdersContent() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">All Orders</h1>
-      {orders.length === 0 ? (
-        <EmptyState title="No orders" message="No orders have been placed yet." />
-      ) : (
-        orders.map((o) => (
-          <Card key={o.id} className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">{o.orderNumber}</p>
-              <p className="text-sm text-gray-500">{o.store?.name} · {o.user?.firstName} {o.user?.lastName}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <OrderStatusBadge status={o.status} />
-              <span className="font-semibold">{formatMoney(o.grandTotal, o.currency)}</span>
-            </div>
-          </Card>
-        ))
-      )}
+      <Card>
+        {orders.length === 0 ? (
+          <EmptyState title="No orders" message="No orders have been placed yet." />
+        ) : (
+          <AdminOrdersTable orders={orders} />
+        )}
+      </Card>
     </div>
   );
 }

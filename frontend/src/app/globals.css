@@ -4,6 +4,7 @@
 
 :root {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Inter', system-ui, sans-serif;
 
   --color-bg: 255 255 255;
   --color-fg: 17 24 39;
@@ -30,6 +31,7 @@ body {
 
 body {
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 input,
@@ -46,15 +48,78 @@ textarea::placeholder {
 
 @layer utilities {
   .container-page {
-    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+    @apply container mx-auto px-4 sm:px-6 lg:px-8 ;
   }
 
   .focus-ring {
-    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+    outline: none;
+    box-shadow: 0 0 0 2px theme('colors.primary.500'), 0 0 0 4px rgb(var(--color-bg));
     --tw-ring-offset-color: rgb(var(--color-bg));
   }
 
   .sr-only-focusable {
-    @apply sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-2 focus:bg-primary-600 focus:text-white;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
+  
+  .sr-only-focusable:focus {
+    position: absolute;
+    z-index: 50;
+    padding: 0.5rem;
+    background-color: rgb(var(--color-primary-600, 13 110 253));
+    color: white;
+    display: auto;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, rgb(var(--color-border)) 25%, rgb(var(--color-border) / 0.5) 37%, rgb(var(--color-border)) 63%);
+    background-size: 400% 100%;
+  }
+}
+
+.range-thumb::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: rgb(var(--color-bg));
+  border: 2px solid theme('colors.primary.600');
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: rgb(var(--color-bg));
+  border: 2px solid theme('colors.primary.600');
+  cursor: pointer;
 }

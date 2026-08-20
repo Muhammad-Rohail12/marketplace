@@ -8,24 +8,16 @@ export default function Modal({ isOpen, onClose, title, children, className = ''
 
   useEffect(() => {
     if (!isOpen) return;
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose?.();
-    };
-
+    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose?.(); };
     document.addEventListener('keydown', handleKeyDown);
     dialogRef.current?.focus();
-
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-fade-in" onClick={onClose}>
       <div
         ref={dialogRef}
         role="dialog"
@@ -34,16 +26,12 @@ export default function Modal({ isOpen, onClose, title, children, className = ''
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'w-full max-w-md rounded-lg bg-white p-6 shadow-dropdown dark:bg-gray-900',
-          'focus-visible:focus-ring',
+          'w-full max-w-md rounded-xl bg-white p-6 shadow-modal dark:bg-neutral-900',
+          'animate-slide-up focus-visible:focus-ring',
           className
         )}
       >
-        {title && (
-          <h2 id="modal-title" className="mb-4 text-lg font-semibold">
-            {title}
-          </h2>
-        )}
+        {title && <h2 id="modal-title" className="mb-4 text-lg font-semibold">{title}</h2>}
         {children}
       </div>
     </div>

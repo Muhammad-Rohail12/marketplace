@@ -129,6 +129,15 @@ const listByBrand = asyncHandler(async (req, res) => {
   sendSuccess(res, { statusCode: httpStatus.OK, message: 'Products retrieved', data: { products: items }, meta });
 });
 
+// ADD this controller alongside the existing listByCategory / listByBrand:
+
+const listByStore = asyncHandler(async (req, res) => {
+  const { items, meta } = await service.listPublicByStore(req.params.storeId, req.query);
+  sendSuccess(res, { statusCode: httpStatus.OK, message: 'Products retrieved', data: { products: items }, meta });
+});
+
+// ADD listByStore to the module.exports object alongside the existing exports.
+
 const getRelated = asyncHandler(async (req, res) => {
   const products = await service.getRelatedProducts(Number(req.params.id));
   sendSuccess(res, { statusCode: httpStatus.OK, message: 'Related products retrieved', data: { products } });
@@ -138,5 +147,5 @@ module.exports = {
   createProduct, listMyProducts, getMyProduct, updateProduct, updateAttributes, updateSpecifications,
   createVariant, updateVariant, deleteVariant, submitProduct, archiveProduct, duplicateProduct,
   listAllProducts, getProduct, approveProduct, rejectProduct, deactivateProduct, adminArchiveProduct,
-  getPublicProduct, listByCategory, listByBrand, getRelated,
+  getPublicProduct, listByCategory, listByBrand, listByStore, getRelated,
 };

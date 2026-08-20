@@ -94,6 +94,8 @@ const clearCart = async (userId) => {
   await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
 };
 
+const isProductShippable = (product) => !['DIGITAL_PLACEHOLDER', 'SERVICE_PLACEHOLDER'].includes(product.productType);
+
 // ---- MODIFIED: buildCartResponse now resolves shipping per group ----
 
 const buildCartResponse = async (userId) => {
@@ -106,7 +108,7 @@ const buildCartResponse = async (userId) => {
         include: {
           product: {
             select: {
-              id: true, name: true, slug: true, status: true, visibility: true, productType: true, isShippable: true,
+              id: true, name: true, slug: true, status: true, visibility: true, productType: true,
               store: { select: { id: true, name: true, slug: true, logo: true, sellerId: true } },
               media: { where: { isPrimary: true, status: 'ACTIVE' }, take: 1, select: { url: true, altText: true } },
             },
@@ -158,7 +160,7 @@ const buildCartResponse = async (userId) => {
 
     resolvedItems.push({
       id: item.id, productId: item.productId, variantId: item.variantId, quantity: item.quantity,
-      product: { id: item.product.id, name: item.product.name, slug: item.product.slug, isShippable: item.product.isShippable },
+      product: { id: item.product.id, name: item.product.name, slug: item.product.slug, isShippable: isProductShippable(item.product) },
       variant: item.variant ? { id: item.variant.id, name: item.variant.name } : null,
       image: item.product.media?.[0] || null,
       store: item.product.store,

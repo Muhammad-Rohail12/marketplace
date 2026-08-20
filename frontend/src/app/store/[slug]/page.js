@@ -4,12 +4,14 @@ import StoreHeader from '@/components/store/StoreHeader';
 import StoreInfo from '@/components/store/StoreInfo';
 import StoreContact from '@/components/store/StoreContact';
 import StorePolicies from '@/components/store/StorePolicies';
+import StoreProductsGrid from '@/components/store/StoreProductsGrid';
 import { storeService } from '@/services/storeService';
 
 export default async function PublicStorePage({ params }) {
   let store;
   try {
-    const res = await storeService.getPublicStore(params.slug);
+    const { slug } = await params;
+    const res = await storeService.getPublicStore(slug);
     store = res.data.store;
   } catch {
     notFound();
@@ -22,9 +24,7 @@ export default async function PublicStorePage({ params }) {
         <StoreInfo store={store} />
         {store.contact && <StoreContact contact={store.contact} />}
         <StorePolicies policies={store.policies} />
-        <div className="rounded-lg border border-dashed border-gray-300 p-10 text-center text-gray-400 dark:border-gray-700">
-          Products from this store will appear here soon.
-        </div>
+        <StoreProductsGrid storeId={store.id} />
       </div>
     </MainLayout>
   );

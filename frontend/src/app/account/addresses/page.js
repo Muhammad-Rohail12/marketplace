@@ -1,12 +1,12 @@
 'use client';
 
-import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AccountLayout from '@/components/account/AccountLayout';
 import AddressList from '@/components/address/AddressList';
 
 function AddressesContent() {
   return (
-    <div className="container-page py-10">
+    <div>
       <h1 className="mb-6 text-2xl font-semibold">My Addresses</h1>
       <AddressList />
     </div>
@@ -15,10 +15,10 @@ function AddressesContent() {
 
 export default function AddressesPage() {
   return (
-    <MainLayout>
+    <AccountLayout>
       <ProtectedRoute>
         <AddressesContent />
       </ProtectedRoute>
-    </MainLayout>
+    </AccountLayout>
   );
 }

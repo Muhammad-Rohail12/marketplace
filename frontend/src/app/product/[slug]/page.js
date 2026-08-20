@@ -1,18 +1,37 @@
 import { notFound } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
-import ProductGallery from '@/components/product/gallery/ProductGallery';
-import ProductPurchaseCard from '@/components/product/ProductPurchaseCard';
+import ProductDetailInteractive from '@/components/product/ProductDetailInteractive';
 import ProductSpecsTable from '@/components/product/ProductSpecsTable';
 import ProductGrid from '@/components/product/ProductGrid';
+import RecentlyViewedTracker from '@/components/product/RecentlyViewedTracker';
+import RecentlyViewedSection from '@/components/product/RecentlyViewedSection';
+import ProductReviewsSection from '@/components/reviews/ProductReviewsSection';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { productService } from '@/services/productService';
 import { mediaService } from '@/services/mediaService';
+import { buildMetadata } from '@/utils/seo';
 import { ROUTES } from '@/constants/routes';
+
+export async function generateMetadata({ params }) {
+  try {
+    const { slug } = await params;
+    const res = await productService.getPublic(slug);
+    const product = res.data.product;
+    return buildMetadata({
+      title: product.seoTitle || product.name,
+      description: product.seoDescription || product.shortDescription,
+      path: `/product/${product.slug}`,
+    });
+  } catch {
+    return buildMetadata({ title: 'Product', noIndex: true });
+  }
+}
 
 export default async function PublicProductPage({ params }) {
   let product;
   try {
-    const res = await productService.getPublic(params.slug);
+    const { slug } = await params;
+    const res = await productService.getPublic(slug);
     product = res.data.product;
   } catch {
     notFound();
@@ -36,7 +55,7 @@ export default async function PublicProductPage({ params }) {
 
   return (
     <MainLayout>
-      <div className="container-page flex flex-col gap-6 py-6">
+      <div className="container-page flex flex-col gap-6 py-6 pb-24">
         <Breadcrumb
           items={[
             { label: 'Home', href: ROUTES.HOME },
@@ -45,37 +64,11 @@ export default async function PublicProductPage({ params }) {
           ]}
         />
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr_320px]">
-          <ProductGallery media={media} />
+        <RecentlyViewedTracker product={product} />
 
-          <div className="flex flex-col gap-3">
-            {product.brand && <span className="text-sm text-primary-600">{product.brand.name}</span>}
-            <h1 className="text-2xl font-semibold">{product.name}</h1>
-            <span className="text-sm text-gray-400">★★★★★ (0 reviews — coming soon)</span>
-            {product.shortDescription && <p className="text-gray-600 dark:text-gray-400">{product.shortDescription}</p>}
+        <ProductDetailInteractive product={product} media={media} />
 
-            {product.attributeValues?.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {product.attributeValues.map((av, i) => (
-                  <span key={i} className="rounded-full bg-gray-100 px-2 py-1 text-xs dark:bg-gray-800">
-                    {av.attribute.name}: {av.attributeValue?.label || av.value}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {product.description && (
-              <div>
-                <h2 className="mb-1 text-sm font-semibold uppercase text-gray-500">About this item</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{product.description}</p>
-              </div>
-            )}
-
-            <ProductSpecsTable specifications={product.specifications} />
-          </div>
-
-          <ProductPurchaseCard product={product} />
-        </div>
+        <ProductSpecsTable specifications={product.specifications} />
 
         {related.length > 0 && (
           <section className="flex flex-col gap-3">
@@ -83,6 +76,10 @@ export default async function PublicProductPage({ params }) {
             <ProductGrid products={related} />
           </section>
         )}
+
+        <RecentlyViewedSection excludeProductId={product.id} />
+
+        <ProductReviewsSection productId={product.id} productName={product.name} />
       </div>
     </MainLayout>
   );
