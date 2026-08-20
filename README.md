@@ -1,6 +1,6 @@
-# Marketplace
+# ZAF Cart
 
-A professional, scalable multi-vendor e-commerce marketplace combining large-marketplace product discovery/seller ecosystem functionality with a practical, delivery-oriented retail/grocery shopping experience. Built as an original platform — not a clone of any existing brand.
+A professional, scalable shopping experience combining product discovery, seller tools, and dependable delivery in one retail platform. Built as an original platform — not a clone of any existing brand.
 
 ## Technology Stack
 

@@ -26,7 +26,7 @@ export default function DealsPage() {
       <div className="container-page flex flex-col gap-8 py-8">
         <div>
           <h1 className="text-2xl font-semibold">Today&apos;s Deals</h1>
-          <p className="text-sm text-neutral-500">Real-time discounts across the marketplace.</p>
+          <p className="text-sm text-neutral-500">Real-time discounts across ZAF Cart.</p>
         </div>
 
         {deals.length === 0 ? (

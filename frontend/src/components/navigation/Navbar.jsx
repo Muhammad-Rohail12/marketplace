@@ -43,7 +43,7 @@ export default function Navbar() {
           </button>
 
           <Link href={ROUTES.HOME} className="shrink-0 text-xl font-bold text-primary-600">
-            Marketplace
+            ZAF Cart
           </Link>
 
           <DeliveryLocationBadge />

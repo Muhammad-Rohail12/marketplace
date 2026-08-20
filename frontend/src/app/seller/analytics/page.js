@@ -44,7 +44,7 @@ function SellerAnalyticsContent() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold">Seller Analytics</h1>
-        <p className="mt-1 text-sm text-neutral-500">A live operational snapshot of your marketplace activity.</p>
+        <p className="mt-1 text-sm text-neutral-500">A live operational snapshot of your ZAF Cart activity.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

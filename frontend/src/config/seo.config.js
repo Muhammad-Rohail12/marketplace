@@ -1,9 +1,9 @@
 export const seoConfig = {
-  defaultTitle: 'Marketplace',
-  titleTemplate: '%s | Marketplace',
-  defaultDescription: 'A professional multi-vendor e-commerce marketplace.',
+  defaultTitle: 'ZAF Cart',
+  titleTemplate: '%s | ZAF Cart',
+  defaultDescription: 'A modern shopping experience with trusted sellers and convenient delivery.',
   openGraph: {
-    siteName: 'Marketplace',
+    siteName: 'ZAF Cart',
     type: 'website',
   },
 };

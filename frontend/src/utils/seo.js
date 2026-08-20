@@ -1,11 +1,11 @@
-const SITE_NAME = 'Marketplace';
-const DEFAULT_DESCRIPTION = 'Shop millions of products across every category, with fast US shipping and trusted sellers.';
+const SITE_NAME = 'ZAF Cart';
+const DEFAULT_DESCRIPTION = 'Shop products from trusted sellers with fast US shipping and convenient delivery.';
 
 // Single source for building App Router metadata objects — every
 // page-level metadata export below goes through this so title
 // formatting/fallbacks stay consistent site-wide.
 export function buildMetadata({ title, description, image, path, noIndex = false } = {}) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Shop the US Marketplace`;
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Shop smart`;
   const desc = description?.slice(0, 160) || DEFAULT_DESCRIPTION;
 
   return {

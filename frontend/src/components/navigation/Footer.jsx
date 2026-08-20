@@ -19,7 +19,7 @@ const COLUMNS = [
   {
     title: 'Make Money With Us',
     links: [
-      { label: 'Sell on Marketplace', href: '/sell' },
+      { label: 'Sell on ZAF Cart', href: '/sell' },
       { label: 'Become an Affiliate', href: '/affiliate' },
       { label: 'Advertise Your Products', href: '/advertise' },
     ],
@@ -88,7 +88,7 @@ export default function Footer() {
 
       <div className="border-t border-neutral-800">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-5 text-xs sm:flex-row">
-          <p>© {new Date().getFullYear()} Marketplace, Inc. All rights reserved. United States 🇺🇸</p>
+          <p>© {new Date().getFullYear()} ZAF Cart. All rights reserved. United States 🇺🇸</p>
           <div className="flex items-center gap-3">
             <Link href="/privacy" className="hover:text-white">Privacy</Link>
             <Link href="/terms" className="hover:text-white">Terms</Link>

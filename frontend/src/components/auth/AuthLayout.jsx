@@ -13,7 +13,7 @@ export default function AuthLayout({ children, showBrandPanel = true }) {
       <div className="flex w-full flex-col justify-center px-6 py-10 sm:px-12 lg:w-1/2">
         <div className="mx-auto w-full max-w-sm">
           <Link href={ROUTES.HOME} className="mb-8 inline-block text-xl font-bold text-primary-600">
-            Marketplace
+            ZAF Cart
           </Link>
           {children}
         </div>

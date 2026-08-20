@@ -23,7 +23,7 @@ export default function PlatformLowStockWidget() {
       {items === null ? (
         <p className="text-sm text-neutral-400">Loading...</p>
       ) : items.length === 0 ? (
-        <EmptyState title="Nothing low on stock" message="Inventory levels look healthy across the marketplace." />
+        <EmptyState title="Nothing low on stock" message="Inventory levels look healthy across ZAF Cart." />
       ) : (
         <div className="flex flex-col divide-y divide-neutral-100 dark:divide-neutral-900">
           {items.map((inv) => (

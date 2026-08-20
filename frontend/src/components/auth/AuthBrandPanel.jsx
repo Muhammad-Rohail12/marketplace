@@ -3,7 +3,7 @@ import { FiShield, FiTruck, FiUsers } from 'react-icons/fi';
 const POINTS = [
   { icon: FiShield, text: 'Secure, encrypted account protection' },
   { icon: FiTruck, text: 'Fast shipping across the United States' },
-  { icon: FiUsers, text: 'Thousands of trusted sellers, one marketplace' },
+  { icon: FiUsers, text: 'Thousands of trusted sellers, one ZAF Cart community' },
 ];
 
 export default function AuthBrandPanel() {
@@ -11,7 +11,7 @@ export default function AuthBrandPanel() {
     <div className="flex h-full flex-col justify-between bg-linear-to-br from-primary-800 to-neutral-900 p-12 text-white">
       <div>
         <h1 className="text-3xl font-bold leading-tight text-balance">
-          Everything you need, all in one marketplace.
+          Everything you need, all in one place with ZAF Cart.
         </h1>
         <p className="mt-3 max-w-sm text-white/70">
           Join a growing community of shoppers and sellers across the US.
@@ -29,7 +29,7 @@ export default function AuthBrandPanel() {
         ))}
       </div>
 
-      <p className="text-xs text-white/40">© {new Date().getFullYear()} Marketplace, Inc.</p>
+      <p className="text-xs text-white/40">© {new Date().getFullYear()} ZAF Cart.</p>
     </div>
   );
 }

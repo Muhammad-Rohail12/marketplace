@@ -4,7 +4,7 @@ export default function TopUtilityBar() {
   return (
     <div className="hidden bg-neutral-900 text-neutral-300 md:block">
       <div className="container-page flex h-9 items-center justify-between text-xs">
-        <p>Welcome to Marketplace — Free shipping on eligible US orders</p>
+        <p>Welcome to ZAF Cart — Free shipping on eligible US orders</p>
         <nav aria-label="Utility navigation" className="flex items-center gap-4">
           <Link href="/deals" className="font-medium text-secondary-400 hover:text-secondary-300">Today&apos;s Deals</Link>
           <Link href="/contact" className="hover:text-white">Contact Us</Link>

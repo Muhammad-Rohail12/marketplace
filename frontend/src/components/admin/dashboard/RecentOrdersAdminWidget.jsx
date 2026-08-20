@@ -24,7 +24,7 @@ export default function RecentOrdersAdminWidget() {
       {orders === null ? (
         <p className="text-sm text-neutral-400">Loading...</p>
       ) : orders.length === 0 ? (
-        <EmptyState title="No orders yet" message="Orders placed across the marketplace will appear here." />
+        <EmptyState title="No orders yet" message="Orders placed across ZAF Cart will appear here." />
       ) : (
         <div className="flex flex-col divide-y divide-neutral-100 dark:divide-neutral-900">
           {orders.map((o) => (
