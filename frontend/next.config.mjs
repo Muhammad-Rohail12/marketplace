@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const backendOrigin = process.env.NEXT_PUBLIC_API_URL
   ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-  : 'http://localhost:5000';
+  : 'https://api.zafcart.com/api';
 
 const nextConfig = {
   reactStrictMode: true,
